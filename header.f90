@@ -121,7 +121,7 @@ MODULE header
   !-------------------------------------------------------------------
 #ifdef allow_particle
   integer            :: NP,NPR,ini_particle_time,parti_file_num    !@ variables used for particles
-  integer            :: parti_outfreq                             
+  integer            :: parti_inifreq, parti_outfreq                             
   REAL(KIND=rc_kind) :: pcx, pcy, pcz, pcr                        
 #endif
   

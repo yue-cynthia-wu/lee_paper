@@ -1,6 +1,6 @@
 subroutine write_cdf_2D_y(jslice,counter_2d,n)
 
-   USE header,ONLY : NI,NJ,NK,ntr,nconsume,s,T,rho,u,v,w,vor,xc,zc,DL, &
+   USE header,ONLY : NI,NJ,NK,rho,u,v,w,xc,zc,DL,UL,WL, & !,ntr,nconsume,s,T,vor
         time_seconds,time_days,dirout,rc_kind                                                  
 
 #include "netcdf.inc" 
@@ -8,12 +8,12 @@ subroutine write_cdf_2D_y(jslice,counter_2d,n)
    character(LEN=150) outname 
    integer :: itr,jslice,counter_2d,i,j,k,n
    REAL(kind=rc_kind) :: rcode
-   REAL(kind=4) :: xslice(NI),zslice(NI,NK),                       &
-  &                Tslice(NI,NK),rslice(NI,NK),uslice(NI,NK),      &
-  &                vslice(NI,NK),wslice(NI,NK),vorslice(NI,NK)      
-   integer :: start(4),count(4),counttim,dims(4),dims4(4),dimstim, &
+   REAL(kind=4) :: xslice(NI),zslice(NI,NK),                                &
+  &                rslice(NI,NK),uslice(NI,NK),vslice(NI,NK),wslice(NI,NK)!,&
+!   &                Tslice(NI,NK),vorslice(NI,NK)
+   integer :: start(4),count(4),counttim,dims(4),dims4(4),dimstim,          &
               start2d(2),count4(4),start4(4) 
-   integer :: iddatfile,idvx,idvz,idvtim,idvu,idvv,idvw,idvvor,    &
+   integer :: iddatfile,idvx,idvz,idvtim,idvu,idvv,idvw,idvvor,             &
               idvbz,idvby,idvrho,idvt,idvs 
         
 ! =================================================================================================
@@ -23,17 +23,17 @@ subroutine write_cdf_2D_y(jslice,counter_2d,n)
    do k=1,NK 
       do i=1,NI 
          zslice(i,k)= zc(i,j,k)*DL 
-         xslice(i)= xc(i) 
+         xslice(i)  = xc(i)    *DL
          !for tracer
 !            do itr=1,ntr 
 !               trslice(itr,i,k)= Tr(itr,i,j,k,n) 
 !            end do 
 !             Tslice(i,k)= T(i,j,k,n) 
          rslice(i,k)  = rho(i,j,k) 
-         uslice(i,k)  = u(i,j,k,n) 
-         vslice(i,k)  = v(i,j,k,n) 
-         wslice(i,k)  = w(i,j,k,n) 
-         vorslice(i,k)= vor(i,j,k) 
+         uslice(i,k)  = u(i,j,k,n)*UL
+         vslice(i,k)  = v(i,j,k,n)*UL
+         wslice(i,k)  = w(i,j,k,n)*WL
+!          vorslice(i,k)= vor(i,j,k) 
       end do 
    end do 
 
@@ -66,7 +66,7 @@ subroutine write_cdf_2D_y(jslice,counter_2d,n)
       idvx  = ncvdef(idDatFile,'xc',  NCFLOAT,1,dims(1),rcode) 
       idvz  = ncvdef(idDatFile,'zc',  NCFLOAT,3,dims,   rcode) 
       idvtim= ncvdef(idDatFile,'day', NCFLOAT,1,dimstim,rcode) 
-!       idvt  = ncvdef(idDatFile,'temp',NCFLOAT,4,dims,   rcode)
+!     idvt  = ncvdef(idDatFile,'temp',NCFLOAT,4,dims,   rcode)
 !     idvt  = ncvdef(idDatFile,'tr',  NCFLOAT,4,dims4,  rcode) 
       idvrho= ncvdef(idDatFile,'rho', NCFLOAT,4,dims,   rcode) 
       idvu  = ncvdef(idDatFile,'u',   NCFLOAT,4,dims,   rcode) 
@@ -129,13 +129,14 @@ subroutine write_cdf_2D_y(jslice,counter_2d,n)
       CALL ncvpt(idDatFile,idvx,start(1),count(1),xslice,   rcode) 
       CALL ncvpt(idDatFile,idvz,start,   count,   zslice,   rcode) 
    endif 
-   CALL ncvpt(idDatFile,idvtim, start(4),counttim,time_days,rcode) 
+   
+!  CALL ncvpt(idDatFile,idvtim, start(4),counttim,time_days,rcode) 
 !  CALL ncvpt(idDatFile,idvt,   start,   count,   Tslice,   rcode) 
    CALL ncvpt(idDatFile,idvrho, start,   count,   rslice,   rcode) 
    CALL ncvpt(idDatFile,idvu,   start,   count,   uslice,   rcode) 
    CALL ncvpt(idDatFile,idvv,   start,   count,   vslice,   rcode) 
    CALL ncvpt(idDatFile,idvw,   start,   count,   wslice,   rcode) 
-!    CALL ncvpt(idDatFile,idvvor, start,   count,   vorslice, rcode) 
+!  CALL ncvpt(idDatFile,idvvor, start,   count,   vorslice, rcode) 
 
    CALL ncclos(idDatFile,rcode) 
 
