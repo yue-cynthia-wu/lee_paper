@@ -3,8 +3,8 @@ subroutine write_cdf_3D(stepl,n)
    USE header,only: NI,NJ,NK,xc,yc,zc,p,h,consump,T,s,rho,Tr,u,v,w,vor,pv,uf,vf,wf,Kz,conv,con100,nconsume,dirout,rc_kind,ntr,&
                     zf,Jac,UL,WL,LEN,DL,Kz,Kx,Ky,iv_compute_kh,iv_compute_kz  ! drpx,drpy
 ! #ifdef extra_output
-   USE header,only: term_advcT, term_advcU, term_advcV, term_advcW, term_restT, term_restU,& !!! ADDED
-       term_dissTh,term_dissUh,term_dissVh,term_dissWh,term_dissTv,term_dissUv,term_dissVv,term_dissWv!!! ADDED
+!    USE header,only: term_advcT, term_advcU, term_advcV, term_advcW, term_restT, term_restU,& !!! ADDED
+!        term_dissTh,term_dissUh,term_dissVh,term_dissWh,term_dissTv,term_dissUv,term_dissVv,term_dissWv!!! ADDED
 ! #endif
 
 #include "netcdf.inc"                                                                        
@@ -29,13 +29,13 @@ subroutine write_cdf_3D(stepl,n)
    integer :: idvwb,idvwc,idvwpv,idvw,idvy,idvzsave,idvz,idvz3,idwdx,idwdy,idwdz,iimday,ipos
    integer :: idvx,idvcon100,idFaceFile,idvuf,idvvf,idvwf,idvKf
    
-   integer :: idvzf,idvJac,idvptfx,idvptfy,idvptfz  ! ,idvptc                                 !! ADDED
+   integer :: idvzf,idvJac,idvptfx,idvptfy,idvptfz !,idvptc                                 !! ADDED
    integer :: idvKz,idvKx,idvKy                                                               !! ADDED
 !    integer :: idvdrpy, idvdrpx,idvugeo,idvvgeo,idvdum1,idvdum2,idvdum3,idvfdiv              !! ADDED
-! #ifdef extra_output
+#ifdef extra_output
    integer :: idvadvcT, idvadvcU, idvadvcV, idvadvcW, idvrestT, idvrestU                      !! ADDED
    integer :: idvdissTh,idvdissUh,idvdissVh,idvdissWh,idvdissTv,idvdissUv,idvdissVv,idvdissWv !! ADDED
-! #endif
+#endif
 
 !    REAL(kind=rc_kind), dimension(    0:NI+1,0:NJ+1, 0:NK+1) :: ugeo, vgeo                     !! ADDED
    REAL(kind=rc_kind), dimension(    0:NI+1,0:NJ+1, 0:NK+1) :: ptc                            !! ADDED
@@ -169,7 +169,7 @@ endif
 if (iv_compute_kz==1) then
    idvKz    =ncvdef(idDatFile,'Kz',     NCDOUBLE,3,dims,   rcode) !! ADDED
 endif
-! #ifdef extra_output
+#ifdef extra_output
    idvadvcT =ncvdef(idDatFile,'advcT',  NCDOUBLE,3,dims,   rcode) !! ADDED
    idvadvcU =ncvdef(idDatFile,'advcU',  NCDOUBLE,3,dims,   rcode) !! ADDED
    idvadvcV =ncvdef(idDatFile,'advcV',  NCDOUBLE,3,dims,   rcode) !! ADDED
@@ -184,7 +184,7 @@ endif
    idvdissUv=ncvdef(idDatFile,'dissUv', NCDOUBLE,3,dims,   rcode) !! ADDED
    idvdissVv=ncvdef(idDatFile,'dissVv', NCDOUBLE,3,dims,   rcode) !! ADDED
    idvdissWv=ncvdef(idDatFile,'dissWv', NCDOUBLE,3,dims,   rcode) !! ADDED
-! #endif
+#endif
    !---------------------------------------
    !                Write
    !---------------------------------------
@@ -228,7 +228,7 @@ if (iv_compute_kz==1) then
    CALL ncvpt(idDatFile,idvKz,    start,   count,   Kz,         rcode) !! ADDED
 endif
 
-! #ifdef extra_output
+#ifdef extra_output
    CALL ncvpt(idDatFile,idvadvcT, start,   count,   term_advcT, rcode) !! ADDED
    CALL ncvpt(idDatFile,idvadvcU, start,   count,   term_advcU, rcode) !! ADDED
    CALL ncvpt(idDatFile,idvadvcV, start,   count,   term_advcV, rcode) !! ADDED
@@ -243,8 +243,9 @@ endif
    CALL ncvpt(idDatFile,idvdissUv,start,   count,   term_dissUv,rcode) !! ADDED
    CALL ncvpt(idDatFile,idvdissVv,start,   count,   term_dissVv,rcode) !! ADDED
    CALL ncvpt(idDatFile,idvdissWv,start,   count,   term_dissWv,rcode) !! ADDED
-! #endif
-   CALL ncclos(idDatFile,rcode)
+#endif
+
+CALL ncclos(idDatFile,rcode)
 
 ! =================================================================================================
 !                                         Face values
@@ -289,10 +290,10 @@ endif
    CALL ncvpt(idFaceFile,idvuf,  start,countuf,uf*UL*LEN*DL,  rcode)
    CALL ncvpt(idFaceFile,idvvf,  start,countvf,vf*UL*LEN*DL,  rcode)
    CALL ncvpt(idFaceFile,idvwf,  start,countwf,wf*UL*LEN*DL,  rcode)
-!    CALL ncvpt(idFaceFile,idvKf,start,countwf,Kz,  rcode)
-   CALL ncvpt(idFaceFile,idvptfx,start,countuf,ptfx,rcode) !! ADDED
-   CALL ncvpt(idFaceFile,idvptfy,start,countvf,ptfy,rcode) !! ADDED
-   CALL ncvpt(idFaceFile,idvptfz,start,countwf,ptfz,rcode) !! ADDED
+!  CALL ncvpt(idFaceFile,idvKf,  start,countwf,Kz,  rcode)
+   CALL ncvpt(idFaceFile,idvptfx,start,countuf,ptfx,rcode)    !! ADDED
+   CALL ncvpt(idFaceFile,idvptfy,start,countvf,ptfy,rcode)    !! ADDED
+   CALL ncvpt(idFaceFile,idvptfz,start,countwf,ptfz,rcode)    !! ADDED
    CALL ncclos(idFaceFile,rcode)
 
 ! =================================================================================================

@@ -1,6 +1,6 @@
   subroutine write_cdf(step,n)
 
-  USE header,ONLY : NI,NJ,NK,ntr,nconsume,nsteps,dirout,out1d_int,out2d_int,out3d_int,rc_kind,pvt,pv1,pv2,pv3,time_days
+  USE header,ONLY : NI,NJ,NK,ntr,nconsume,nsteps,dirout,out1d_int,out2d_int,out3d_int,rc_kind,pvt,pv1,pv2,pv3
   IMPLICIT NONE
 
   INTEGER :: step,counter_1d,counter_2d,counter_3d,ksurf,islice,jslice,imooring,jmooring,n
@@ -49,18 +49,22 @@
   end if
 
 ! -------------------  3D output  -------------------
-
-if ((time_days<5).OR.(time_days>6)) then ! Day<5 or Day>6
-   if (mod(step,out3d_int).eq.0) then ! output every day
-      counter_3d= step/out3d_int +1
-      call write_cdf_3D(step,n)
-   endif
-   
-else ! 5 < Day < 6
-  if (mod(step,out2d_int).eq.0) then
+  if ((mod(step,out3d_int).eq.0).or.(step.eq.nsteps)) then
+!     write(6,*) 'write_cdf_3D'
     counter_3d= step/out3d_int +1
+    
+!     if (step.eq.0) then
+!        write(6,*) 'write_cdf_3D_ini'
+!        counter_3d= step/out3d_int +1
+!        call write_cdf_3D_ini(step,n)
+!     else
+!        write(6,*) 'write_cdf_3D'
+!        counter_3d= step/out3d_int +1
+!        call write_cdf_3D(step,n)
+!     endif
+
     call write_cdf_3D(step,n)
-  endif
-endif
+!   call write_cdf_3D_strain(step,n)
+  end if
 
   END 

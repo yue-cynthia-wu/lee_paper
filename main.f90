@@ -2,17 +2,17 @@ PROGRAM main
 
    USE header                   ! Declaration of variables
 
-#include "cppdefs.h"
-#include "main_declarations.h"  ! Some additional declarations
-#include "ini_param.h"          ! Namelist is read and major parameters are defined
-
 #ifdef relaxation
-   use relaxation
+   USE relaxation
 #endif
 
 #ifdef allow_particle
    USE particles
 #endif
+
+#include "cppdefs.h"
+#include "main_declarations.h"  ! Some additional declarations
+#include "ini_param.h"          ! Namelist is read and major parameters are defined
 
 !==================================================================================================
 !                                        Initialization 
