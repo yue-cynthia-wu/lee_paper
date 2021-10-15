@@ -50,13 +50,13 @@
 
 ! -------------------  3D output  -------------------
 
-if ((time_days<5).OR.(time_days>6)) then ! Day<5 or Day>6
+if ((time_days<5).OR.(time_days>9)) then ! Day<5 or Day>6
    if (mod(step,out3d_int).eq.0) then ! output every day
       counter_3d= step/out3d_int +1
       call write_cdf_3D(step,n)
    endif
    
-else ! 5 < Day < 6
+else ! 5 < Day < 9
   if (mod(step,out2d_int).eq.0) then
     counter_3d= step/out3d_int +1
     call write_cdf_3D(step,n)
