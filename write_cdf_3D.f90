@@ -3,8 +3,8 @@ subroutine write_cdf_3D(stepl,n)
    USE header,only: NI,NJ,NK,xc,yc,zc,p,h,consump,T,s,rho,Tr,u,v,w,vor,pv,uf,vf,wf,Kz,conv,con100,nconsume,dirout,rc_kind,ntr,&
                     zf,Jac,UL,WL,LEN,DL,Kz,Kx,Ky,iv_compute_kh,iv_compute_kz  ! drpx,drpy
 ! #ifdef extra_output
-!    USE header,only: term_advcT, term_advcU, term_advcV, term_advcW, term_restT, term_restU,& !!! ADDED
-!        term_dissTh,term_dissUh,term_dissVh,term_dissWh,term_dissTv,term_dissUv,term_dissVv,term_dissWv!!! ADDED
+   USE header,only: term_advcT, term_advcU, term_advcV, term_advcW, term_restT, term_restU,& !!! ADDED
+       term_dissTh,term_dissUh,term_dissVh,term_dissWh,term_dissTv,term_dissUv,term_dissVv,term_dissWv!!! ADDED
 ! #endif
 
 #include "netcdf.inc"                                                                        
@@ -32,10 +32,10 @@ subroutine write_cdf_3D(stepl,n)
    integer :: idvzf,idvJac,idvptfx,idvptfy,idvptfz !,idvptc                                 !! ADDED
    integer :: idvKz,idvKx,idvKy                                                               !! ADDED
 !    integer :: idvdrpy, idvdrpx,idvugeo,idvvgeo,idvdum1,idvdum2,idvdum3,idvfdiv              !! ADDED
-#ifdef extra_output
+! #ifdef extra_output
    integer :: idvadvcT, idvadvcU, idvadvcV, idvadvcW, idvrestT, idvrestU                      !! ADDED
    integer :: idvdissTh,idvdissUh,idvdissVh,idvdissWh,idvdissTv,idvdissUv,idvdissVv,idvdissWv !! ADDED
-#endif
+! #endif
 
 !    REAL(kind=rc_kind), dimension(    0:NI+1,0:NJ+1, 0:NK+1) :: ugeo, vgeo                     !! ADDED
    REAL(kind=rc_kind), dimension(    0:NI+1,0:NJ+1, 0:NK+1) :: ptc                            !! ADDED
@@ -133,10 +133,10 @@ subroutine write_cdf_3D(stepl,n)
    !                  ID
    !---------------------------------------
 !    if (stepl.lt.0.5) then
-   idvx     =ncvdef(idDatFile,'xc',     NCDOUBLE,1,dims(1),rcode)
-   idvy     =ncvdef(idDatFile,'yc',     NCDOUBLE,1,dims(2),rcode)
-   idvz     =ncvdef(idDatFile,'zc',     NCDOUBLE,3,dims,   rcode)
-   idvzf    =ncvdef(idDatFile,'zf',     NCDOUBLE,3,dims,   rcode)
+!    idvx     =ncvdef(idDatFile,'xc',     NCDOUBLE,1,dims(1),rcode)
+!    idvy     =ncvdef(idDatFile,'yc',     NCDOUBLE,1,dims(2),rcode)
+!    idvz     =ncvdef(idDatFile,'zc',     NCDOUBLE,3,dims,   rcode)
+!    idvzf    =ncvdef(idDatFile,'zf',     NCDOUBLE,3,dims,   rcode)
 !    endif
 !    idvh     =ncvdef(idDatFile,'h',      NCDOUBLE,2,dims2d, rcode)
 !    idvc     =ncvdef(idDatFile,'consump',NCDOUBLE,4,dimsconsump,rcode)
@@ -169,7 +169,7 @@ endif
 if (iv_compute_kz==1) then
    idvKz    =ncvdef(idDatFile,'Kz',     NCDOUBLE,3,dims,   rcode) !! ADDED
 endif
-#ifdef extra_output
+! #ifdef extra_output
    idvadvcT =ncvdef(idDatFile,'advcT',  NCDOUBLE,3,dims,   rcode) !! ADDED
    idvadvcU =ncvdef(idDatFile,'advcU',  NCDOUBLE,3,dims,   rcode) !! ADDED
    idvadvcV =ncvdef(idDatFile,'advcV',  NCDOUBLE,3,dims,   rcode) !! ADDED
@@ -184,17 +184,17 @@ endif
    idvdissUv=ncvdef(idDatFile,'dissUv', NCDOUBLE,3,dims,   rcode) !! ADDED
    idvdissVv=ncvdef(idDatFile,'dissVv', NCDOUBLE,3,dims,   rcode) !! ADDED
    idvdissWv=ncvdef(idDatFile,'dissWv', NCDOUBLE,3,dims,   rcode) !! ADDED
-#endif
+! #endif
    !---------------------------------------
    !                Write
    !---------------------------------------
    ! 
 !    if (stepl.lt.0.5) then
    CALL ncendf(idDatFile,rcode)
-   CALL ncvpt(idDatFile,idvx,     start(1),count(1),xc*DL,      rcode)
-   CALL ncvpt(idDatFile,idvy,     start(2),count(2),yc*DL,      rcode)
-   CALL ncvpt(idDatFile,idvz,     start,   count,   zc*DL,      rcode)
-   CALL ncvpt(idDatFile,idvzf,    start,   count,   zf(:,:,-1:NK)*DL,rcode)
+!    CALL ncvpt(idDatFile,idvx,     start(1),count(1),xc*DL,      rcode)
+!    CALL ncvpt(idDatFile,idvy,     start(2),count(2),yc*DL,      rcode)
+!    CALL ncvpt(idDatFile,idvz,     start,   count,   zc*DL,      rcode)
+!    CALL ncvpt(idDatFile,idvzf,    start,   count,   zf(:,:,-1:NK)*DL,rcode)
 !    endif
 !    CALL ncvpt(idDatFile,idvh,     start2d, count2d, h,          rcode)
 !    CALL ncvpt(idDatFile,idvc,     start4, count4consump,consump,rcode)
@@ -228,7 +228,7 @@ if (iv_compute_kz==1) then
    CALL ncvpt(idDatFile,idvKz,    start,   count,   Kz,         rcode) !! ADDED
 endif
 
-#ifdef extra_output
+! #ifdef extra_output
    CALL ncvpt(idDatFile,idvadvcT, start,   count,   term_advcT, rcode) !! ADDED
    CALL ncvpt(idDatFile,idvadvcU, start,   count,   term_advcU, rcode) !! ADDED
    CALL ncvpt(idDatFile,idvadvcV, start,   count,   term_advcV, rcode) !! ADDED
@@ -243,7 +243,7 @@ endif
    CALL ncvpt(idDatFile,idvdissUv,start,   count,   term_dissUv,rcode) !! ADDED
    CALL ncvpt(idDatFile,idvdissVv,start,   count,   term_dissVv,rcode) !! ADDED
    CALL ncvpt(idDatFile,idvdissWv,start,   count,   term_dissWv,rcode) !! ADDED
-#endif
+! #endif
 
 CALL ncclos(idDatFile,rcode)
 
@@ -260,13 +260,13 @@ CALL ncclos(idDatFile,rcode)
    countvf(1)= NI  ; countvf(2)= NJ+1; countvf(3)= NK  ;
    countwf(1)= NI  ; countwf(2)= NJ  ; countwf(3)= NK+1;
 
-   dimuf(1) = ncddef(idFaceFile,'xi-ew',   NI+1,rcode)
-   dimuf(2) = ncddef(idFaceFile,'eta-ew',  NJ,  rcode)
-   dimuf(3) = ncddef(idFaceFile,'sigma-ew',NK,  rcode)
+!    dimuf(1) = ncddef(idFaceFile,'xi-ew',   NI+1,rcode)
+!    dimuf(2) = ncddef(idFaceFile,'eta-ew',  NJ,  rcode)
+!    dimuf(3) = ncddef(idFaceFile,'sigma-ew',NK,  rcode)
 
-   dimvf(1) = ncddef(idFaceFile,'xi-ns',   NI,  rcode)
-   dimvf(2) = ncddef(idFaceFile,'eta-ns',  NJ+1,rcode)
-   dimvf(3) = ncddef(idFaceFile,'sigma-ns',NK,  rcode)
+!    dimvf(1) = ncddef(idFaceFile,'xi-ns',   NI,  rcode)
+!    dimvf(2) = ncddef(idFaceFile,'eta-ns',  NJ+1,rcode)
+!    dimvf(3) = ncddef(idFaceFile,'sigma-ns',NK,  rcode)
 
    dimwf(1) = ncddef(idFaceFile,'xi-tb',   NI,  rcode)
    dimwf(2) = ncddef(idFaceFile,'eta-tb',  NJ,  rcode)
@@ -275,25 +275,25 @@ CALL ncclos(idDatFile,rcode)
    !---------------------------------------
    !                  ID
    !---------------------------------------
-   idvuf   = ncvdef(idFaceFile,'uf',  NCDOUBLE,3,dimuf,rcode)
-   idvvf   = ncvdef(idFaceFile,'vf',  NCDOUBLE,3,dimvf,rcode)
+!    idvKf   = ncvdef(idFaceFile,'Kz',  NCDOUBLE,3,dimwf,rcode)
+!    idvuf   = ncvdef(idFaceFile,'uf',  NCDOUBLE,3,dimuf,rcode)
+!    idvvf   = ncvdef(idFaceFile,'vf',  NCDOUBLE,3,dimvf,rcode)
    idvwf   = ncvdef(idFaceFile,'wf',  NCDOUBLE,3,dimwf,rcode)
-!    idvKf = ncvdef(idFaceFile,'Kz',  NCDOUBLE,3,dimwf,rcode)
-   idvptfx = ncvdef(idFaceFile,'ptfx',NCDOUBLE,3,dimuf,rcode) !! ADDED
-   idvptfy = ncvdef(idFaceFile,'ptfy',NCDOUBLE,3,dimvf,rcode) !! ADDED
-   idvptfz = ncvdef(idFaceFile,'ptfz',NCDOUBLE,3,dimwf,rcode) !! ADDED
+!    idvptfx = ncvdef(idFaceFile,'ptfx',NCDOUBLE,3,dimuf,rcode) !! ADDED
+!    idvptfy = ncvdef(idFaceFile,'ptfy',NCDOUBLE,3,dimvf,rcode) !! ADDED
+   idvptfz = ncvdef(idFaceFile,'ptfz',NCDOUBLE,3,dimwf,rcode)   !! ADDED
 
    !---------------------------------------
    !                Write
    !---------------------------------------
    CALL ncendf(idFaceFile,rcode)
-   CALL ncvpt(idFaceFile,idvuf,  start,countuf,uf*UL*LEN*DL,  rcode)
-   CALL ncvpt(idFaceFile,idvvf,  start,countvf,vf*UL*LEN*DL,  rcode)
-   CALL ncvpt(idFaceFile,idvwf,  start,countwf,wf*UL*LEN*DL,  rcode)
-!  CALL ncvpt(idFaceFile,idvKf,  start,countwf,Kz,  rcode)
-   CALL ncvpt(idFaceFile,idvptfx,start,countuf,ptfx,rcode)    !! ADDED
-   CALL ncvpt(idFaceFile,idvptfy,start,countvf,ptfy,rcode)    !! ADDED
-   CALL ncvpt(idFaceFile,idvptfz,start,countwf,ptfz,rcode)    !! ADDED
+!  CALL ncvpt(idFaceFile,idvKf,  start,countwf,Kz,           rcode)
+!  CALL ncvpt(idFaceFile,idvuf,  start,countuf,uf*UL*LEN*DL, rcode)
+!  CALL ncvpt(idFaceFile,idvvf,  start,countvf,vf*UL*LEN*DL, rcode)
+   CALL ncvpt(idFaceFile,idvwf,  start,countwf,wf*UL*LEN*DL, rcode)
+!  CALL ncvpt(idFaceFile,idvptfx,start,countuf,ptfx,         rcode) !! ADDED
+!  CALL ncvpt(idFaceFile,idvptfy,start,countvf,ptfy,         rcode) !! ADDED
+   CALL ncvpt(idFaceFile,idvptfz,start,countwf,ptfz,         rcode) !! ADDED
    CALL ncclos(idFaceFile,rcode)
 
 ! =================================================================================================
