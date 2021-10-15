@@ -1,6 +1,6 @@
 subroutine write_cdf_3D(stepl,n)
 
-   USE header,only: NI,NJ,NK,xc,yc,zc,p,h,consump,T,s,rho,Tr,u,v,w,vor,pv,uf,vf,wf,Kz,conv,con100,nconsume,dirout,rc_kind,ntr,&
+   USE header,only: NI,NJ,NK,xc,yc,zc,p,h,consump,T,s,rho,Tr,u,v,w,vor,pv3,uf,vf,wf,Kz,conv,con100,nconsume,dirout,rc_kind,ntr,&
                     zf,Jac,UL,WL,LEN,DL,Kz,Kx,Ky,iv_compute_kh,iv_compute_kz  ! drpx,drpy
 ! #ifdef extra_output
    USE header,only: term_advcT, term_advcU, term_advcV, term_advcW, term_restT, term_restU,& !!! ADDED
@@ -29,7 +29,7 @@ subroutine write_cdf_3D(stepl,n)
    integer :: idvwb,idvwc,idvwpv,idvw,idvy,idvzsave,idvz,idvz3,idwdx,idwdy,idwdz,iimday,ipos
    integer :: idvx,idvcon100,idFaceFile,idvuf,idvvf,idvwf,idvKf
    
-   integer :: idvzf,idvJac,idvptfx,idvptfy,idvptfz !,idvptc                                 !! ADDED
+   integer :: idvzf,idvJac,idvptfx,idvptfy,idvptfz!,idvptc                                 !! ADDED
    integer :: idvKz,idvKx,idvKy                                                               !! ADDED
 !    integer :: idvdrpy, idvdrpx,idvugeo,idvvgeo,idvdum1,idvdum2,idvdum3,idvfdiv              !! ADDED
 ! #ifdef extra_output
@@ -82,6 +82,7 @@ subroutine write_cdf_3D(stepl,n)
 !     end do
 !   end do
 
+   call diag_pv(n); ! pvt=pv1+pv2+pv3;
    call diag_ptc(ptc)                 !! ADDED
    call intpol_pt(ptc,ptfx,ptfy,ptfz) !! ADDED
 !    call gradup3df                     !! ADDED
@@ -151,7 +152,7 @@ subroutine write_cdf_3D(stepl,n)
 !    idvvgeo  =ncvdef(idDatFile,'vgeo',   NCDOUBLE,3,dims,   rcode)
    idvw     =ncvdef(idDatFile,'w',      NCDOUBLE,3,dims,   rcode)
 !    idvz3    =ncvdef(idDatFile,'vor',    NCDOUBLE,3,dims,   rcode)
-!    idvpv    =ncvdef(idDatFile,'pv',     NCDOUBLE,3,dims,   rcode)
+   idvpv    =ncvdef(idDatFile,'pv',     NCDOUBLE,3,dims,   rcode)
 !    idvcon   =ncvdef(idDatFile,'conv',   NCshort, 3,dims,   rcode)
 !    idvcon100=ncvdef(idDatFile,'con100', NCshort, 3,dims,   rcode)
 !    idvJac   =ncvdef(idDatFile,'Jac',    NCDOUBLE,3,dims,   rcode) !! ADDED
@@ -209,7 +210,7 @@ endif
 !    CALL ncvpt(idDatFile,idvvgeo,  start,   count,   vgeo*UL,    rcode)
    CALL ncvpt(idDatFile,idvw,     start,   count,   w*WL,       rcode)
 !    CALL ncvpt(idDatFile,idvz3,    start,   count,   vor,        rcode)
-!    CALL ncvpt(idDatFile,idvpv,    start,   count,   pv,         rcode)
+   CALL ncvpt(idDatFile,idvpv,    start,   count,   pv3,        rcode)
 !    CALL ncvpt(idDatFile,idvcon,   start,   count,   conv,       rcode)
 !    CALL ncvpt(idDatFile,idvcon100,start,   count,   con100,     rcode)
 !    CALL ncvpt(idDatFile,idvJac,   start,   count,   Jac,        rcode) !! ADDED
