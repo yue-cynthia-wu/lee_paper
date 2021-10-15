@@ -1,4 +1,4 @@
-subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
+subroutine write_cdf_2D_x(islice,counter_2d,n)
 
    USE header,ONLY : NI,NJ,NK,rho,u,v,w,ntr,nconsume, & !,s,T,consump,Tr
   &    yc,zc,DL,UL,WL, & ! KzMom,KzTr,shear,vor,freqN2,fricb,stress_top_x,stress_top_y, &
@@ -16,14 +16,14 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
 !    REAL(kind=rc_kind) :: svert(NK),Tvert(NK),rvert(NK),uvert(NK),vvert(NK),wvert(NK),zvert(NK),seval
 
 
-   REAL(kind=rc_kind) :: ptc(0:NI+1,0:NJ+1,0:NK+1)
+!    REAL(kind=rc_kind) :: ptc(0:NI+1,0:NJ+1,0:NK+1)
    
    REAL(kind=4) :: yslice(NJ),zslice(NJ,NK), & ! conslice(nconsume,NJ,NK),                                 &
   &     rslice(NJ,NK), & !sslice(NJ,NK),Tslice(NJ,NK),                                                     &
 !   &     s_ini_no_ghost(NJ,NK),T_ini_no_ghost(NJ,NK),s_restore_no_ghost(NJ,NK),T_restore_no_ghost(NJ,NK), &
 !   &     Trslice(ntr,NJ,NK),shearslice(NJ,NK),                                                            &
-  &     uslice(NJ,NK),vslice(NJ,NK),wslice(NJ,NK), & !vorslice(NJ,NK),                                     &
-  &     pbar(NJ,NK),term_vp_bar(NJ,NK),term_vp_pri(NJ,NK),term_wp_bar(NJ,NK),term_wp_pri(NJ,NK)
+  &     uslice(NJ,NK),vslice(NJ,NK),wslice(NJ,NK)!, & !vorslice(NJ,NK),                                     &
+!   &     pbar(NJ,NK),term_vp_bar(NJ,NK),term_vp_pri(NJ,NK),term_wp_bar(NJ,NK),term_wp_pri(NJ,NK)
 !   &     ugslice(NJ,NK),vgslice(NJ,NK),                                                                   &
 !   &     n2slice(NJ,NK),n2barslice(NJ,NK),zcave(NK),fricbsl(NJ,NK),                                       &
 !   &     stressxsp(NJ),stressysp(NJ),pvtslice(NJ,NK),pv3slice(NJ,NK),pslice(NJ,NK),swrsl(NJ),qlosssl(NJ)
@@ -57,14 +57,14 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
    integer start(4),count(4),dims(4),start2d(2),dims4(4),dims4c(4),start4(4),      &
            count4(4),count4c(4),dimstim,counttim,count1d,dims1d,dimswind(3)
 !            countwind(3),startwind(3)
-   integer :: iddatfile,idigit,idudx,idudy,dudz,idvbysection,idvby,idvbz,idvcon,idvcy,idvbx
-   integer :: idvcz,idvc,idvdivfeddy,idvdivfreyn,idvdx,idvdz,idvd,idvfb,idvh,idvn2bar
-   integer :: idvn2,idvnsq100m,idvnsq30m,idvpe,idvpsiv,idvpsiw,idvpv,idvp,idvrhbar,idvrho,idvrnk
-   integer :: idvstrain,idvstressx,idvstressy,idvstr,idvs,idvtbar,idvtemp,         &
-  &           idvtim,idvtr,idvt,idvu,idvvb,idvvc,idvvor,idvv,idvug,idvvg
+   integer :: iddatfile !,idigit,idudx,idudy,dudz,idvbysection,idvby,idvbz,idvcon,idvcy,idvbx
+!    integer :: idvcz,idvc,idvdivfeddy,idvdivfreyn,idvdx,idvdz,idvd,idvfb,idvh,idvn2bar
+!    integer :: idvn2,idvnsq100m,idvnsq30m,idvpe,idvpsiv,idvpsiw,idvpv,idvp,idvrhbar,idvrnk
+!    integer :: idvstrain,idvstressx,idvstressy,idvstr,idvs,idvtbar,idvtemp
+   integer :: idvtim,idvtr,idvt,idvu,idvvb,idvvc,idvvor,idvv,idvug,idvvg,idvrho
    integer :: idvwb,idvwc,idvwpv,idvw,idvy,idvzsave,idvz
-   integer :: idvzave,idvshear,idvpvt,idvpv3
-   integer :: idv_vp_bar,idv_vp_pri,idv_wp_bar,idv_wp_pri !,idv_pbar,idvtini,idvsini,idvtrestore,idvsrestore   !!! ADDED
+!    integer :: idvzave,idvshear,idvpvt,idvpv3
+!    integer :: idv_vp_bar,idv_vp_pri,idv_wp_bar,idv_wp_pri !,idv_pbar,idvtini,idvsini,idvtrestore,idvsrestore   !!! ADDED
    REAL(kind=rc_kind) :: rcode
 
 ! =================================================================================================
@@ -75,34 +75,34 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
 !    print *, "shape(ptc) = ", shape(pbar)
 !    print *, "shape(ptc) = ", shape(term_wp_bar)
 
-   pbar= 0.d0
-   do j=1,NJ
-      do k=1,NK
-         do i=1,NI
-            pbar(j,k)= pbar(j,k) + ptc(i,j,k)
-         enddo
-         pbar(j,k)= pbar(j,k)/dble(NI)
-      enddo
-   enddo
-
-   term_vp_bar= 0.d0
-   term_vp_pri= 0.d0
-   term_wp_bar= 0.d0
-   term_wp_pri= 0.d0
-   do j=1,NJ
-      do k=1,NK
-         do i=1,NI
-            term_vp_bar(j,k)= term_vp_bar(j,k) + v(i,j,k,n)*UL*  pbar(j,k)
-            term_vp_pri(j,k)= term_vp_pri(j,k) + v(i,j,k,n)*UL*( ptc(i,j,k)-pbar(j,k) )
-            term_wp_bar(j,k)= term_wp_bar(j,k) + w(i,j,k,n)*WL*  pbar(j,k)
-            term_wp_pri(j,k)= term_wp_pri(j,k) + w(i,j,k,n)*WL*( ptc(i,j,k)-pbar(j,k) )
-         enddo
-         term_vp_bar(j,k)= term_vp_bar(j,k)/dble(NI)
-         term_vp_pri(j,k)= term_vp_pri(j,k)/dble(NI)
-         term_wp_bar(j,k)= term_wp_bar(j,k)/dble(NI)
-         term_wp_pri(j,k)= term_wp_pri(j,k)/dble(NI)
-      enddo
-   enddo
+!    pbar= 0.d0
+!    do j=1,NJ
+!       do k=1,NK
+!          do i=1,NI
+!             pbar(j,k)= pbar(j,k) + ptc(i,j,k)
+!          enddo
+!          pbar(j,k)= pbar(j,k)/dble(NI)
+!       enddo
+!    enddo
+!
+!    term_vp_bar= 0.d0
+!    term_vp_pri= 0.d0
+!    term_wp_bar= 0.d0
+!    term_wp_pri= 0.d0
+!    do j=1,NJ
+!       do k=1,NK
+!          do i=1,NI
+!             term_vp_bar(j,k)= term_vp_bar(j,k) + v(i,j,k,n)*UL*  pbar(j,k)
+!             term_vp_pri(j,k)= term_vp_pri(j,k) + v(i,j,k,n)*UL*( ptc(i,j,k)-pbar(j,k) )
+!             term_wp_bar(j,k)= term_wp_bar(j,k) + w(i,j,k,n)*WL*  pbar(j,k)
+!             term_wp_pri(j,k)= term_wp_pri(j,k) + w(i,j,k,n)*WL*( ptc(i,j,k)-pbar(j,k) )
+!          enddo
+!          term_vp_bar(j,k)= term_vp_bar(j,k)/dble(NI)
+!          term_vp_pri(j,k)= term_vp_pri(j,k)/dble(NI)
+!          term_wp_bar(j,k)= term_wp_bar(j,k)/dble(NI)
+!          term_wp_pri(j,k)= term_wp_pri(j,k)/dble(NI)
+!       enddo
+!    enddo
    
 ! =================================================================================================
 !                                       Initialization
@@ -271,7 +271,7 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
       idvy      = ncvdef(idDatFile,'yc',       NCFLOAT,1,dims(2), rcode) 
 !       idvzave   = ncvdef(idDatFile, 'zcave',   NCFLOAT,1,dims1d,  rcode)
       idvz      = ncvdef(idDatFile,'zc',       NCFLOAT,3,dims,    rcode) 
-      idvtim    = ncvdef(idDatFile,'day',      NCFLOAT,1,dimstim, rcode) 
+!       idvtim    = ncvdef(idDatFile,'day',      NCFLOAT,1,dimstim, rcode) 
          
 !      idvstressx = ncvdef(idDatFile, 'stressx', NCFLOAT,3,dimswind,rcode)
 !      idvstressy = ncvdef(idDatFile, 'stressy', NCFLOAT,3,dimswind,rcode)
@@ -327,10 +327,10 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
 !       idvpec     = ncvdef(idDatFile,'psieddytracer',NCFLOAT,4,dims,rcode)                                
          
 !       idv_pbar   = ncvdef(idDatFile,'term_pbar',   NCFLOAT,4,dims,rcode)      !!! ADDED
-      idv_vp_bar = ncvdef(idDatFile,'term_vp_bar', NCFLOAT,4,dims,rcode)      !!! ADDED
-      idv_vp_pri = ncvdef(idDatFile,'term_vp_pri', NCFLOAT,4,dims,rcode)      !!! ADDED
-      idv_wp_bar = ncvdef(idDatFile,'term_wp_bar', NCFLOAT,4,dims,rcode)      !!! ADDED
-      idv_wp_pri = ncvdef(idDatFile,'term_wp_pri', NCFLOAT,4,dims,rcode)      !!! ADDED
+!       idv_vp_bar = ncvdef(idDatFile,'term_vp_bar', NCFLOAT,4,dims,rcode)      !!! ADDED
+!       idv_vp_pri = ncvdef(idDatFile,'term_vp_pri', NCFLOAT,4,dims,rcode)      !!! ADDED
+!       idv_wp_bar = ncvdef(idDatFile,'term_wp_bar', NCFLOAT,4,dims,rcode)      !!! ADDED
+!       idv_wp_pri = ncvdef(idDatFile,'term_wp_pri', NCFLOAT,4,dims,rcode)      !!! ADDED
 
       CALL ncendf(idDatFile,rcode) 
 
@@ -340,7 +340,7 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
       !---------------------------------------
       idDatFile = ncopn(TRIM(dirout)//outname, NCWRITE,rcode) 
 !       call ncredf(idDatFile,rcode)
-      idvtim     = NCVID(idDatFile,'day',     RCODE) 
+!       idvtim     = NCVID(idDatFile,'day',     RCODE) 
 !       idvstressx = NCVID(idDatFile,'stressx', RCODE)
 !       idvstressy = NCVID(idDatFile,'stressy', RCODE)
 !       idvswr     = NCVID(idDatFile,'swr',     RCODE)
@@ -395,10 +395,10 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
 !       idvpec = NCVID(idDatFile,'psieddytracer',rcode)
 
 !       idv_pbar   = NCVID(idDatFile, 'term_pbar',  RCODE)      !!! ADDED
-      idv_vp_bar = NCVID(idDatFile, 'term_vp_bar',RCODE)      !!! ADDED
-      idv_vp_pri = NCVID(idDatFile, 'term_vp_pri',RCODE)      !!! ADDED
-      idv_wp_bar = NCVID(idDatFile, 'term_wp_bar',RCODE)      !!! ADDED
-      idv_wp_pri = NCVID(idDatFile, 'term_wp_pri',RCODE)      !!! ADDED
+!       idv_vp_bar = NCVID(idDatFile, 'term_vp_bar',RCODE)      !!! ADDED
+!       idv_vp_pri = NCVID(idDatFile, 'term_vp_pri',RCODE)      !!! ADDED
+!       idv_wp_bar = NCVID(idDatFile, 'term_wp_bar',RCODE)      !!! ADDED
+!       idv_wp_pri = NCVID(idDatFile, 'term_wp_pri',RCODE)      !!! ADDED
    endif 
 
 ! =================================================================================================
@@ -522,10 +522,10 @@ subroutine write_cdf_2D_x(islice,counter_2d,n,ptc)
 !    CALL ncvpt(idDatFile,idvpec,      start4,count4,csfeddysl,         rcode)
 
 !    CALL ncvpt(idDatFile,idv_pbar,    start, count, pbar,          rcode)     !!! ADDED
-   CALL ncvpt(idDatFile,idv_vp_bar,  start, count, term_vp_bar,   rcode)     !!! ADDED
-   CALL ncvpt(idDatFile,idv_vp_pri , start, count, term_vp_pri,   rcode)     !!! ADDED
-   CALL ncvpt(idDatFile,idv_wp_bar,  start, count, term_wp_bar,   rcode)     !!! ADDED
-   CALL ncvpt(idDatFile,idv_wp_pri , start, count, term_wp_pri,   rcode)     !!! ADDED
+!    CALL ncvpt(idDatFile,idv_vp_bar,  start, count, term_vp_bar,   rcode)     !!! ADDED
+!    CALL ncvpt(idDatFile,idv_vp_pri , start, count, term_vp_pri,   rcode)     !!! ADDED
+!    CALL ncvpt(idDatFile,idv_wp_bar,  start, count, term_wp_bar,   rcode)     !!! ADDED
+!    CALL ncvpt(idDatFile,idv_wp_pri , start, count, term_wp_pri,   rcode)     !!! ADDED
    
    CALL ncclos(idDatFile,rcode) 
    return 
